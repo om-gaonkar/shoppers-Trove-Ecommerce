@@ -1,0 +1,7 @@
+-------FRONT-END--------
+1.Create a floder Structure
+2.Make the Layout
+3.Define the Routes
+4.Write a 'CheckAuth' component to check if the user does not access the protected Routes
+    - 'CheckAuth' component is used to protect the routes 
+    - we wrap all the routes with 'CheckAuth' to protect them
