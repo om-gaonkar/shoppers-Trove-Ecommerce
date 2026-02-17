@@ -14,7 +14,7 @@ import ProductImageUpload from "@/components/AdminView/ProductImageUpload";
 import { useDispatch, useSelector } from "react-redux";
 import { addProduct, deleteProducts, editProducts, fetchAllProducts } from "@/store/admin/productSlice/index";
 import AdminProductTile from "@/components/AdminView/ProductTile";
-import { data } from "react-router";
+
 const initialFormData = {
     img: null,
     title: "",
