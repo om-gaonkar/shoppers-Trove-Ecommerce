@@ -1,12 +1,12 @@
-import { HousePlug, ShoppingCart } from 'lucide-react'
-import React, { useState, useCallback, useRef } from 'react'
+import { HousePlug, ShoppingCart, Sidebar } from 'lucide-react'
+import React, { useState, useCallback, useRef, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router'
 import { shoppingViewHeaderMenuItems } from '@/Config/userNavbar'
 import { Button } from '../ui/button'
 import { useDispatch, useSelector } from 'react-redux'
 
 
-import { User, LogOut } from "lucide-react";
+import { User, LogOut, MenuIcon, X } from "lucide-react";
 import { logout } from '@/store/auth-slice/authSlice'
 
 function UserDropdown({ user }) {
@@ -119,7 +119,7 @@ function ShoppingMenuList() {
 function ShoppingRightContent({ user }) {
 
     return (
-        <div className='flex items-center justify-center flex-row gap-2'>
+        <div className='hidden md:flex items-center  justify-center flex-row gap-2'>
             <Button>
                 <ShoppingCart className='w-6 h-6' />
                 <span>cart</span>
@@ -129,8 +129,102 @@ function ShoppingRightContent({ user }) {
     )
 }
 
-const ShoppingHeader = () => {
-    const { isAuthenticated, user } = useSelector((state) => state.auth)
+function MobileNavbar({ user }) {
+    const [isSidebarOpen, setSideBarOpen] = useState(false);
+    const dispatch = useDispatch();
+
+    function handleLogout() {
+        dispatch(logout());
+        setSideBarOpen(false);
+    }
+
+    return (
+        <div className="md:hidden">
+            {/* Hamburger Button */}
+            <button onClick={() => setSideBarOpen(true)}>
+                <MenuIcon className="h-6 w-6" />
+            </button>
+
+            {/* Overlay */}
+            {isSidebarOpen && (
+                <div
+                    className="fixed inset-0 z-40 bg-black/40 backdrop-blur-sm"
+                    onClick={() => setSideBarOpen(false)}
+                />
+            )}
+
+            {/* Sidebar */}
+            <aside
+                className={`fixed top-0 right-0 z-50 h-full w-72 bg-white shadow-2xl
+                transform transition-transform duration-300 ease-in-out
+                ${isSidebarOpen ? "translate-x-0" : "translate-x-full"}`}
+            >
+                {/* Header */}
+                <div className="flex items-center justify-between p-5 border-b">
+                    <h2 className="text-lg font-semibold">Menu</h2>
+                    <button onClick={() => setSideBarOpen(false)}>
+                        <X className="h-6 w-6" />
+                    </button>
+                </div>
+
+                {/* Content */}
+                <div className="flex flex-col justify-between h-[calc(100%-72px)] overflow-y-auto p-5">
+
+                    {/* Navigation Links */}
+                    <nav className="flex flex-col gap-2 font-medium text-gray-700">
+                        {shoppingViewHeaderMenuItems.map((item) => (
+                            <Link
+                                key={item.id}
+                                to={item.path}
+                                onClick={() => setSideBarOpen(false)}
+                                className="py-2 px-3 rounded-lg hover:bg-gray-100 transition"
+                            >
+                                {item.label}
+                            </Link>
+                        ))}
+                    </nav>
+
+                    {/* User Section */}
+                    {user && (
+                        <div className="mt-8 border-t pt-6">
+                            <p className="text-sm text-gray-500 mb-4">
+                                Logged in as
+                                <span className="block font-semibold text-gray-900">
+                                    {user.userName}
+                                </span>
+                            </p>
+
+                            <Link
+                                to="/shop/accounts"
+                                onClick={() => setSideBarOpen(false)}
+                                className="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100 transition"
+                            >
+                                <User size={18} />
+                                Account
+                            </Link>
+
+                            <button
+                                onClick={handleLogout}
+                                className="mt-3 flex items-center gap-3 px-3 py-2 rounded-lg text-red-600 hover:bg-red-50 transition w-full"
+                            >
+                                <LogOut size={18} />
+                                Logout
+                            </button>
+                        </div>
+                    )}
+                </div>
+            </aside>
+        </div>
+    );
+}
+
+
+const ShoppingHeader = ({ isAuthenticated, user }) => {
+    // const { isAuthenticated, user } = useSelector((state) => state.auth)
+    useEffect(() => {
+        console.log("Mounted");
+    }, []);
+    console.log("Header Rendered")
     console.log("auth----", isAuthenticated)
     console.log("user---", user)
     return (
@@ -140,10 +234,14 @@ const ShoppingHeader = () => {
                     <HousePlug className="h-6 w-6" />
                     <span className="font-bold">Ecommerce</span>
                 </Link>
+
                 <ShoppingMenuList />
                 <ShoppingRightContent user={user} />
 
+                <MobileNavbar user={user} />
+
             </div>
+
         </header>
 
     )
